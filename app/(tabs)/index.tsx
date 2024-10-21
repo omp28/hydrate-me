@@ -1,10 +1,15 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';;
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import WaterLevelCard from '../../components/WaterLevelCard'; // Import the new component
 import LottieView from "lottie-react-native";
+import useUserInfoStore from '@/store/useUserDataStore';
+import getGreeting from "../../utils/GetGreetMessage"
+import WaterBottle from '@/components/WaterBottle';
+import AppContainer from '@/components/DailyWaterConsumptionGraph';
+
 
 export default function HomeScreen() {
   let [fontsLoading] = useFonts({
@@ -16,6 +21,13 @@ export default function HomeScreen() {
     'roboto-regular': require('../../assets/fonts/Roboto-Regular.ttf'),
   });
 
+  const UserName = useUserInfoStore((state) => state.userName);
+  const updateUserInfo = useUserInfoStore((state) => state.updateUserInfo)
+
+  useEffect(() => {
+    updateUserInfo(); // Fetch user data
+  }, []);
+
   if (!fontsLoading) {
     return <AppLoading />;
   }
@@ -23,10 +35,8 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.greeting}>
-        <Text style={styles.greetingMessage}>Good Morning,</Text>
-        <Text style={styles.greetingName}>Abhinav Prajapati</Text>
-
-
+        <Text style={styles.greetingMessage}>{getGreeting()},</Text>
+        <Text style={styles.greetingName}>{UserName}</Text>
       </View>
 
       <View style={styles.card}>
@@ -41,11 +51,24 @@ export default function HomeScreen() {
       </View>
 
       <WaterLevelCard />
+
+      <View style={styles.graphAndBottleCard}>
+        <AppContainer />
+        <WaterBottle waterBottleLevel={30} mode='breath' lightColor='green' isBottlePlaced={true} />
+      </View>
+
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+
+  graphAndBottleCard: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 15,
+  },
   container: {
     backgroundColor: '#F2F7FA',
     flex: 1,

@@ -1,28 +1,53 @@
-import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
 import LottieView from 'lottie-react-native';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import useUserInfoStore from '@/store/useUserDataStore';
 
 const WaterLevelCard = () => {
   const animationRef = useRef<LottieView>(null);
+  const [previousWaterIntake, setPreviousWaterIntake] = useState(0);
 
-  // Function to stop the animation at a specific frame
-  const stopAtFrame = () => {
+  const DailyGoal = useUserInfoStore((state) => state.dailyGoal);
+  const TodayWaterIntake = useUserInfoStore((store) => store.todayWaterIntake);
+  const updateUserInfo = useUserInfoStore((state) => state.updateUserInfo);
+
+  // Function to calculate water intake percentage
+  const getWaterConsumePercent = (current: number, goal: number): number => {
+    if (goal === 0) return 0;
+    return (current / goal) * 100;
+  };
+
+  // Function to stop animation at a specific percentage of frames
+  const playFromPreviousToNewFrame = (prevPercent: number, newPercent: number) => {
     if (animationRef.current) {
-      animationRef.current.pause();
-      animationRef.current.play(0, 70); // Play from frame 0 to frame 110
+      const totalFrames = 110; // water gets full thill 110th frame 
+      const frameStart = Math.floor((prevPercent / 100) * totalFrames);
+      const frameEnd = Math.floor((newPercent / 100) * totalFrames);
+
+      console.log(`Playing from frame ${frameStart} to frame ${frameEnd}`);
+
+      animationRef.current.play(frameStart, frameEnd);
     }
   };
 
   useEffect(() => {
+    const percentagePrevious = getWaterConsumePercent(previousWaterIntake, DailyGoal);
+    const percentageNew = getWaterConsumePercent(TodayWaterIntake, DailyGoal);
+
+    // Play animation from previous water intake frame to new one
     if (animationRef.current) {
-      animationRef.current.play();
+      playFromPreviousToNewFrame(percentagePrevious, percentageNew);
     }
 
-    setTimeout(() => {
-      stopAtFrame();
-    }, 1000); // Stop the animation after 1 second
-  }, []);
+    setPreviousWaterIntake(TodayWaterIntake);
+
+    const intervalId = setInterval(() => {
+      updateUserInfo();
+    }, 2000);
+
+    return () => clearInterval(intervalId); // Clean up the interval on component unmount
+  }, [TodayWaterIntake, DailyGoal]);
 
   return (
     <View style={styles.waterLevelCard}>
@@ -36,11 +61,11 @@ const WaterLevelCard = () => {
 
       <View style={styles.targetCard}>
         <Text style={styles.targetText}>Today's Target</Text>
-        <Text style={styles.targetValueText}>2000ml</Text>
+        <Text style={styles.targetValueText}>{DailyGoal}ml</Text>
       </View>
 
       <View style={styles.lottieWaterLevelContainer}>
-        <Text style={styles.waterLevelText}>500ml</Text>
+        <Text style={styles.waterLevelText}>{Math.floor(TodayWaterIntake)}ml</Text>
         <LottieView
           ref={animationRef}
           source={require('../assets/animation_water_levelll.json')}
