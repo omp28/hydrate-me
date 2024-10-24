@@ -1,8 +1,363 @@
+// // import React, { useState, useEffect } from "react";
+// // import { View, Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
+// // import * as Location from "expo-location";
+// // import axios from "axios";
+// // import { WEATHER_API_KEY } from "../../config";
+
+// // export default function Analysis() {
+// //   const [location, setLocation] = useState<Location.LocationObject | null>(
+// //     null
+// //   );
+// //   const [weatherData, setWeatherData] = useState<any>(null);
+// //   const [loading, setLoading] = useState<boolean>(true);
+
+// //   // OpenWeather API key (replace with your own API key)
+// //   const API_KEY = WEATHER_API_KEY;
+
+// //   // Fetch weather data based on latitude and longitude
+// //   const fetchWeather = async (latitude: number, longitude: number) => {
+// //     console.log("latitudes", latitude, longitude);
+// //     try {
+// //       const response = await axios.get(
+// //         `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`
+// //       );
+// //       setWeatherData(response.data);
+// //     } catch (error) {
+// //       console.error("Error fetching weather data: ", error);
+// //       Alert.alert("Error", "Failed to fetch weather data.");
+// //     } finally {
+// //       setLoading(false);
+// //     }
+// //   };
+
+// //   // Get location permission and fetch user's location
+// //   const getLocation = async () => {
+// //     setLoading(true);
+// //     try {
+// //       const { status } = await Location.requestForegroundPermissionsAsync();
+// //       if (status !== "granted") {
+// //         Alert.alert(
+// //           "Permission Denied",
+// //           "Location access is required to provide weather data."
+// //         );
+// //         return;
+// //       }
+// //       const loc = await Location.getCurrentPositionAsync({});
+// //       setLocation(loc);
+// //       fetchWeather(loc.coords.latitude, loc.coords.longitude);
+// //     } catch (error) {
+// //       console.error("Error getting location: ", error);
+// //       Alert.alert("Error", "Failed to get location.");
+// //     }
+// //   };
+
+// //   useEffect(() => {
+// //     getLocation();
+// //   }, []);
+
+// //   if (loading) {
+// //     return (
+// //       <View style={styles.loadingContainer}>
+// //         <ActivityIndicator size="large" color="#00bfff" />
+// //         <Text>Loading...</Text>
+// //       </View>
+// //     );
+// //   }
+
+// //   return (
+// //     <View style={styles.container}>
+// //       {weatherData ? (
+// //         <View>
+// //           <Text style={styles.header}>Analysis</Text>
+// //           <Text style={styles.text}>Location: {weatherData.name}</Text>
+// //           <Text style={styles.text}>
+// //             Temperature: {weatherData.main.temp}°C
+// //           </Text>
+// //           <Text style={styles.text}>
+// //             Humidity: {weatherData.main.humidity}%
+// //           </Text>
+// //           <Text style={styles.text}>
+// //             Condition: {weatherData.weather[0].description}
+// //           </Text>
+// //         </View>
+// //       ) : (
+// //         <Text>No weather data available.</Text>
+// //       )}
+// //     </View>
+// //   );
+// // }
+
+// // const styles = StyleSheet.create({
+// //   container: {
+// //     flex: 1,
+// //     justifyContent: "center",
+// //     alignItems: "center",
+// //     padding: 20,
+// //   },
+// //   loadingContainer: {
+// //     flex: 1,
+// //     justifyContent: "center",
+// //     alignItems: "center",
+// //   },
+// //   header: {
+// //     fontSize: 24,
+// //     fontWeight: "bold",
+// //     marginBottom: 20,
+// //   },
+// //   text: {
+// //     fontSize: 18,
+// //     marginVertical: 5,
+// //   },
+// // });
+// import React, { useState, useEffect } from "react";
+// import { View, Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
+// import * as Location from "expo-location";
+// import axios from "axios";
+// import { WEATHER_API_KEY } from "../../config";
+
+// // Water intake calculation function
+// function calculateWaterIntake({
+//   gender,
+//   bmi,
+//   baseWaterIntake = 2, // base water intake in liters (default 2 liters/day)
+//   temperature,
+//   humidity,
+//   weatherCondition,
+// }) {
+//   let waterIntake = baseWaterIntake;
+
+//   // Adjust based on gender
+//   if (gender === "male") {
+//     waterIntake += 0.5; // Men typically need more water
+//   } else if (gender === "female") {
+//     waterIntake += 0.3; // Slightly less for women, but can be customized
+//   }
+
+//   // Adjust based on BMI (Body Mass Index)
+//   if (bmi > 25) {
+//     waterIntake += 0.5; // Higher BMI, higher water need
+//   } else if (bmi < 18.5) {
+//     waterIntake += 0.2; // Lower BMI, slight increase in water recommendation
+//   }
+
+//   // Adjust based on temperature
+//   if (temperature > 15 && temperature <= 25) {
+//     waterIntake += 0.5; // Moderate increase for warm temperatures
+//   } else if (temperature > 25) {
+//     waterIntake += 1; // Significant increase for hot temperatures
+//   }
+
+//   // Adjust based on humidity
+//   if (humidity > 60) {
+//     waterIntake += 0.5; // High humidity increases the need for hydration
+//   }
+
+//   // Adjust based on weather condition
+//   if (weatherCondition === "Clear" || weatherCondition === "Sunny") {
+//     waterIntake += 0.5; // Suggest more water intake for sunny weather
+//   } else if (weatherCondition === "Rain" || weatherCondition === "Cloudy") {
+//     waterIntake -= 0.2; // Slight reduction for rainy or cloudy days
+//   }
+
+//   // Ensure water intake is reasonable (min 1.5L and max 5L)
+//   if (waterIntake < 1.5) {
+//     waterIntake = 1.5; // Minimum intake
+//   } else if (waterIntake > 5) {
+//     waterIntake = 5; // Maximum intake to avoid overhydration
+//   }
+
+//   return `Recommended water intake: ${waterIntake.toFixed(1)} liters/day.`;
+// }
+
+// export default function Analysis() {
+//   const [location, setLocation] = useState<Location.LocationObject | null>(
+//     null
+//   );
+//   const [weatherData, setWeatherData] = useState<any>(null);
+//   const [loading, setLoading] = useState<boolean>(true);
+//   const [waterIntake, setWaterIntake] = useState<string>("");
+
+//   const API_KEY = WEATHER_API_KEY;
+
+//   // Fetch weather data based on latitude and longitude
+//   const fetchWeather = async (latitude: number, longitude: number) => {
+//     console.log("latitudes", latitude, longitude);
+//     try {
+//       const response = await axios.get(
+//         `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`
+//       );
+//       setWeatherData(response.data);
+
+//       // Calculate water intake based on weather and user data
+//       const weatherCondition = response.data.weather[0].main;
+//       const temperature = response.data.main.temp;
+//       const humidity = response.data.main.humidity;
+
+//       // Example user data
+//       const user = {
+//         gender: "male", // or 'female'
+//         bmi: 24, // Body Mass Index
+//         temperature: temperature, // Temperature in Celsius
+//         humidity: humidity, // Humidity percentage
+//         weatherCondition: weatherCondition, // Weather condition (e.g., 'Clear', 'Rain', 'Cloudy', etc.)
+//       };
+
+//       const intake = calculateWaterIntake(user);
+//       setWaterIntake(intake);
+//     } catch (error) {
+//       console.error("Error fetching weather data: ", error);
+//       Alert.alert("Error", "Failed to fetch weather data.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Get location permission and fetch user's location
+//   const getLocation = async () => {
+//     setLoading(true);
+//     try {
+//       const { status } = await Location.requestForegroundPermissionsAsync();
+//       if (status !== "granted") {
+//         Alert.alert(
+//           "Permission Denied",
+//           "Location access is required to provide weather data."
+//         );
+//         return;
+//       }
+//       const loc = await Location.getCurrentPositionAsync({});
+//       setLocation(loc);
+//       fetchWeather(loc.coords.latitude, loc.coords.longitude);
+//     } catch (error) {
+//       console.error("Error getting location: ", error);
+//       Alert.alert("Error", "Failed to get location.");
+//     }
+//   };
+
+//   useEffect(() => {
+//     getLocation();
+//   }, []);
+
+//   if (loading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#00bfff" />
+//         <Text>Loading...</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <View style={styles.container}>
+//       {weatherData ? (
+//         <View>
+//           <Text style={styles.header}>Analysis</Text>
+//           <Text style={styles.text}>Location: {weatherData.name}</Text>
+//           <Text style={styles.text}>
+//             Temperature: {weatherData.main.temp}°C
+//           </Text>
+//           <Text style={styles.text}>
+//             Humidity: {weatherData.main.humidity}%
+//           </Text>
+//           <Text style={styles.text}>
+//             Condition: {weatherData.weather[0].description}
+//           </Text>
+//           <Text style={styles.text}>{waterIntake}</Text>
+//         </View>
+//       ) : (
+//         <Text>No weather data available.</Text>
+//       )}
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//     padding: 20,
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+//   header: {
+//     fontSize: 24,
+//     fontWeight: "bold",
+//     marginBottom: 20,
+//   },
+//   text: {
+//     fontSize: 18,
+//     marginVertical: 5,
+//   },
+// });
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+} from "react-native";
 import * as Location from "expo-location";
 import axios from "axios";
 import { WEATHER_API_KEY } from "../../config";
+import { MaterialCommunityIcons } from "@expo/vector-icons"; // For icons
+
+// Water intake calculation function
+function calculateWaterIntake({
+  gender,
+  bmi,
+  baseWaterIntake = 2,
+  temperature,
+  humidity,
+  weatherCondition,
+}) {
+  let waterIntake = baseWaterIntake;
+
+  // Adjust based on gender
+  if (gender === "male") {
+    waterIntake += 0.5;
+  } else if (gender === "female") {
+    waterIntake += 0.3;
+  }
+
+  // Adjust based on BMI
+  if (bmi > 25) {
+    waterIntake += 0.5;
+  } else if (bmi < 18.5) {
+    waterIntake += 0.2;
+  }
+
+  // Adjust based on temperature
+  if (temperature > 15 && temperature <= 25) {
+    waterIntake += 0.5;
+  } else if (temperature > 25) {
+    waterIntake += 1;
+  }
+
+  // Adjust based on humidity
+  if (humidity > 60) {
+    waterIntake += 0.5;
+  }
+
+  // Adjust based on weather condition
+  if (weatherCondition === "Clear" || weatherCondition === "Sunny") {
+    waterIntake += 0.5;
+  } else if (weatherCondition === "Rain" || weatherCondition === "Cloudy") {
+    waterIntake -= 0.2;
+  }
+
+  if (waterIntake < 1.5) {
+    waterIntake = 1.5;
+  } else if (waterIntake > 5) {
+    waterIntake = 5;
+  }
+
+  return `Recommended water intake: ${waterIntake.toFixed(1)} liters/day.`;
+}
 
 export default function Analysis() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -10,18 +365,51 @@ export default function Analysis() {
   );
   const [weatherData, setWeatherData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [waterIntake, setWaterIntake] = useState<string>("");
+  const [clothingSuggestion, setClothingSuggestion] = useState<string>("");
+  const [exerciseAdvice, setExerciseAdvice] = useState<string>("");
 
-  // OpenWeather API key (replace with your own API key)
   const API_KEY = WEATHER_API_KEY;
 
-  // Fetch weather data based on latitude and longitude
   const fetchWeather = async (latitude: number, longitude: number) => {
-    console.log("latitudes", latitude, longitude);
     try {
       const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${31.105}&lon=${77.164}&units=metric&appid=${API_KEY}`
       );
       setWeatherData(response.data);
+
+      const weatherCondition = response.data.weather[0].main;
+      const temperature = response.data.main.temp;
+      const humidity = response.data.main.humidity;
+
+      const user = {
+        gender: "male",
+        bmi: 24,
+        temperature: temperature,
+        humidity: humidity,
+        weatherCondition: weatherCondition,
+      };
+
+      const intake = calculateWaterIntake(user);
+      setWaterIntake(intake);
+
+      // Clothing suggestion based on temperature
+      if (temperature < 10) {
+        setClothingSuggestion("Wear warm clothing like jackets and scarves.");
+      } else if (temperature > 25) {
+        setClothingSuggestion("Wear light clothing like shorts and T-shirts.");
+      } else {
+        setClothingSuggestion("Wear comfortable clothing.");
+      }
+
+      // Exercise advice based on weather
+      if (weatherCondition === "Clear" || weatherCondition === "Sunny") {
+        setExerciseAdvice("Great weather for outdoor exercise! Stay hydrated.");
+      } else if (weatherCondition === "Rain") {
+        setExerciseAdvice("Consider indoor exercises as it's rainy.");
+      } else {
+        setExerciseAdvice("Mild weather, exercise as usual.");
+      }
     } catch (error) {
       console.error("Error fetching weather data: ", error);
       Alert.alert("Error", "Failed to fetch weather data.");
@@ -30,7 +418,6 @@ export default function Analysis() {
     }
   };
 
-  // Get location permission and fetch user's location
   const getLocation = async () => {
     setLoading(true);
     try {
@@ -65,10 +452,10 @@ export default function Analysis() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       {weatherData ? (
-        <View>
-          <Text style={styles.header}>Analysis</Text>
+        <View style={styles.card}>
+          <Text style={styles.header}>Weather Analysis</Text>
           <Text style={styles.text}>Location: {weatherData.name}</Text>
           <Text style={styles.text}>
             Temperature: {weatherData.main.temp}°C
@@ -79,17 +466,38 @@ export default function Analysis() {
           <Text style={styles.text}>
             Condition: {weatherData.weather[0].description}
           </Text>
+
+          <View style={styles.section}>
+            <MaterialCommunityIcons name="water" size={24} color="blue" />
+            <Text style={styles.text}>{waterIntake}</Text>
+          </View>
+
+          <View style={styles.section}>
+            <MaterialCommunityIcons
+              name="tshirt-crew"
+              size={24}
+              color="green"
+            />
+            <Text style={styles.text}>
+              Clothing Recommendation: {clothingSuggestion}
+            </Text>
+          </View>
+
+          <View style={styles.section}>
+            <MaterialCommunityIcons name="run" size={24} color="orange" />
+            <Text style={styles.text}>Exercise Advice: {exerciseAdvice}</Text>
+          </View>
         </View>
       ) : (
         <Text>No weather data available.</Text>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
@@ -99,6 +507,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    marginVertical: 10,
+    width: "90%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   header: {
     fontSize: 24,
     fontWeight: "bold",
@@ -107,5 +530,10 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     marginVertical: 5,
+  },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
   },
 });

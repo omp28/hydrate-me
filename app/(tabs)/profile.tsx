@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,44 +14,82 @@ import {
 } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router"; // Import the router
+import { useRouter } from "expo-router";
+import * as Location from "expo-location";
 
 interface FormData {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   age: string;
   weight: string;
   height: string;
   gender: string;
+  dailyGoal: string;
+  wakeupTime: string;
+  sleepTime: string;
+  latitude: string;
+  longitude: string;
 }
 
 interface Errors {
-  firstName?: string | null;
-  lastName?: string | null;
+  name?: string | null;
   email?: string | null;
   age?: string | null;
   weight?: string | null;
   height?: string | null;
+  dailyGoal?: string | null;
+  wakeupTime?: string | null;
+  sleepTime?: string | null;
 }
 
-// Extract keys that are common between FormData and Errors
 type FormErrorKeys = Extract<keyof FormData, keyof Errors>;
 
 export default function ProfileScreen() {
   const router = useRouter(); // Initialize the router for navigation
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null
+  );
   const [formData, setFormData] = useState<FormData>({
-    firstName: "Om",
-    lastName: "Patel",
+    name: "Om Patel",
     email: "dummy@gmail.com",
     age: "20",
-    weight: "5507",
+    weight: "55",
     height: "170",
     gender: "male",
+    dailyGoal: "2000",
+    wakeupTime: "07:00",
+    sleepTime: "23:00",
+    latitude: "",
+    longitude: "",
   });
   const [errors, setErrors] = useState<Errors>({});
+
+  // Get location permission and fetch user's location
+  const getLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Location access is required to provide location data."
+        );
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({});
+      setLocation(loc);
+      handleChange("latitude", loc.coords.latitude.toString());
+      handleChange("longitude", loc.coords.longitude.toString());
+    } catch (error) {
+      console.error("Error getting location: ", error);
+      Alert.alert("Error", "Failed to get location.");
+    }
+  };
+
+  useEffect(() => {
+    getLocation();
+  }, []);
 
   const handleChange = useCallback(
     (name: keyof FormData, value: string) => {
@@ -70,9 +108,7 @@ export default function ProfileScreen() {
 
   const validateForm = useCallback(() => {
     let newErrors: Errors = {};
-    if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = "Email is invalid";
     if (isNaN(Number(formData.age)) || Number(formData.age) < 1)
@@ -81,6 +117,10 @@ export default function ProfileScreen() {
       newErrors.weight = "Weight must be a valid number";
     if (isNaN(Number(formData.height)) || Number(formData.height) < 1)
       newErrors.height = "Height must be a valid number";
+    if (isNaN(Number(formData.dailyGoal)) || Number(formData.dailyGoal) < 1)
+      newErrors.dailyGoal = "Daily Goal must be a valid number";
+    if (!formData.wakeupTime) newErrors.wakeupTime = "Wakeup time is required";
+    if (!formData.sleepTime) newErrors.sleepTime = "Sleep time is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
@@ -90,16 +130,31 @@ export default function ProfileScreen() {
 
     setIsLoading(true);
     Keyboard.dismiss();
+    console.log("Form Data: ", formData);
     try {
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Form Data Submitted: ", formData);
-      Alert.alert(
-        "Profile Updated",
-        "Your profile has been successfully updated."
-      );
-      setIsEditing(false);
+      const response = await fetch("http://192.168.43.254:3000/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Form Data Submitted: ", result);
+        Alert.alert(
+          "Profile Updated",
+          "Your profile has been successfully updated."
+        );
+        setIsEditing(false);
+      } else {
+        const errorData = await response.json();
+        console.error("Error submitting form: ", errorData);
+        Alert.alert("Error", "Failed to update profile. Please try again.");
+      }
     } catch (error) {
+      console.error("Error submitting form: ", error);
       Alert.alert("Error", "Failed to update profile. Please try again.");
     } finally {
       setIsLoading(false);
@@ -163,12 +218,16 @@ export default function ProfileScreen() {
 
         {/* Input Fields */}
         <View style={styles.inputContainer}>
-          {renderInput("First Name", "firstName")}
-          {renderInput("Last Name", "lastName")}
+          {renderInput("Name", "name")}
           {renderInput("Email Address", "email", "email-address")}
           {renderInput("Age", "age", "numeric")}
           {renderInput("Weight (in kg)", "weight", "numeric")}
           {renderInput("Height (in cm)", "height", "numeric")}
+          {renderInput("Daily Goal (in ml)", "dailyGoal", "numeric")}
+          {renderInput("Wakeup Time", "wakeupTime", "default")}
+          {renderInput("Sleep Time", "sleepTime", "default")}
+          {renderInput("Latitude", "latitude", "numeric")}
+          {renderInput("Longitude", "longitude", "numeric")}
 
           <Text style={styles.label}>Gender</Text>
           <RadioButton.Group
