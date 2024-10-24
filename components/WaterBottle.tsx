@@ -1,7 +1,6 @@
-
-import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Image, Animated, Easing } from 'react-native';
-import { getIsBottleOnDock, getCurrentBottleLevel } from '@/api/api_v1';
+import React, { useEffect, useRef, useState } from "react";
+import { View, StyleSheet, Image, Animated, Easing } from "react-native";
+import { getIsBottleOnDock, getCurrentBottleLevel } from "@/api/api_v1";
 
 type PropsType = {
   waterBottleLevel: number;
@@ -10,8 +9,8 @@ type PropsType = {
 const WaterBottle: React.FC<PropsType> = () => {
   const [isBottlePlaced, setIsBottlePlaced] = useState<boolean>(true);
   const [waterBottleLevel, setWaterBottleLevel] = useState<number>(0); // Manage the water bottle level state
-  const [mode, setMode] = useState<'solid' | 'breath'>('solid');
-  const [lightColor, setLightColor] = useState<string>('yellow'); // Default color when the bottle is placed
+  const [mode, setMode] = useState<"solid" | "breath">("solid");
+  const [lightColor, setLightColor] = useState<string>("yellow"); // Default color when the bottle is placed
 
   const glowAnimation = useRef(new Animated.Value(0)).current;
   const bottlePosition = useRef(new Animated.Value(0)).current; // Control the vertical movement of the bottle
@@ -25,13 +24,13 @@ const WaterBottle: React.FC<PropsType> = () => {
       if (isBottleOnDock === false) {
         // If the bottle is picked up, set breath mode with yellow color
         setIsBottlePlaced(false);
-        setMode('breath');
-        setLightColor('yellow');
+        setMode("breath");
+        setLightColor("yellow");
       } else {
         // If the bottle is placed, set solid mode with green color
         setIsBottlePlaced(true);
-        setMode('solid');
-        setLightColor('#008000'); // green
+        setMode("solid");
+        setLightColor("#008000"); // green
       }
 
       // Fetch the current water bottle level
@@ -46,7 +45,7 @@ const WaterBottle: React.FC<PropsType> = () => {
   }, []);
 
   useEffect(() => {
-    if (mode === 'breath') {
+    if (mode === "breath") {
       // Start breathing animation if mode is "breath"
       Animated.loop(
         Animated.sequence([
@@ -119,20 +118,23 @@ const WaterBottle: React.FC<PropsType> = () => {
           styles.statusLight,
           {
             backgroundColor: lightColor, // Color passed via state
-            opacity: mode === 'breath' ? glowAnimation : 1, // Animation or solid light
+            opacity: mode === "breath" ? glowAnimation : 1, // Animation or solid light
             shadowColor: lightColor, // Shadow matches light color
-            shadowOpacity: mode === 'breath' ? glowAnimation.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0.2, 0.8], // Vary shadow opacity for breathing
-            }) : 0.8, // Solid shadow in solid mode
+            shadowOpacity:
+              mode === "breath"
+                ? glowAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.2, 0.8], // Vary shadow opacity for breathing
+                  })
+                : 0.8, // Solid shadow in solid mode
           },
         ]}
       />
 
-      <Image
+      {/* <Image
         style={styles.dockImage}
         source={require("../assets/images/Dock.png")}
-      />
+      /> */}
     </View>
   );
 };

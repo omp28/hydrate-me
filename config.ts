@@ -1,5 +1,5 @@
 const BASE_URLS: { [key: string]: string } = {
-  development: 'http://192.168.0.114:8000/api',
+  development: 'http://192.168.43.120:8000/api',
   production: 'https://example.com/api',
 };
 
