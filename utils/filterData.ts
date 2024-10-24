@@ -19,7 +19,11 @@ function transformData(rawData: RawData[]): TransformedData[] {
       const hour = date.getHours();
 
       // Calculate the difference from the previous value
-      const relativeValue = previousValue - item.data;
+      
+      var relativeValue = previousValue - item.data;
+      if(relativeValue < 0) {
+        relativeValue = 0;
+      }
 
       // Update the previous value to the current one for the next iteration
       previousValue = item.data;

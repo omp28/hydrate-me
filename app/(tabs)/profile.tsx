@@ -130,7 +130,6 @@ export default function ProfileScreen() {
 
     setIsLoading(true);
     Keyboard.dismiss();
-    console.log("Form Data: ", formData);
     try {
       const response = await fetch("http://192.168.43.254:3000/user", {
         method: "POST",
@@ -142,7 +141,6 @@ export default function ProfileScreen() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log("Form Data Submitted: ", result);
         Alert.alert(
           "Profile Updated",
           "Your profile has been successfully updated."

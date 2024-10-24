@@ -7,4 +7,4 @@ export default function RootLayout() {
     </Stack>
   );
 }
-//<Stack.Screen name="home" />
+<Stack.Screen name="home" />;

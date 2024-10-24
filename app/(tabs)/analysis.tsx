@@ -80,7 +80,7 @@ export default function Analysis() {
   const fetchWeather = async (latitude: number, longitude: number) => {
     try {
       const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${31.105}&lon=${77.164}&units=metric&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`
       );
       setWeatherData(response.data);
 
