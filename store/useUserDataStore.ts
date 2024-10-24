@@ -1,5 +1,6 @@
 import { getUserData } from "@/api/api_v1";
 import { create } from "zustand";
+import { API_URL } from "@/config";
 
 type State = {
   userName: string;
@@ -42,7 +43,7 @@ const useUserInfoStore = create<State & Action>((set) => ({
     }
 
     try {
-      const response = await fetch("http://192.168.0.114:8000/api/v1/user/1/total-water-intake", {
+      const response = await fetch(`${API_URL}/v1/user/1/total-water-intake`, {
         method: "GET",
         headers: {
           Accept: "application/json",

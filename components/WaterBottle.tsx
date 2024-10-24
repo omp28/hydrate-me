@@ -131,10 +131,10 @@ const WaterBottle: React.FC<PropsType> = () => {
         ]}
       />
 
-      {/* <Image
+      <Image
         style={styles.dockImage}
         source={require("../assets/images/Dock.png")}
-      /> */}
+      />
     </View>
   );
 };
