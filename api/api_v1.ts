@@ -13,6 +13,7 @@ export const getTodayWaterConsumption = async () => {
       throw new Error('Fail to fetch daily water Consumption list');
     }
     const data = await response.json();
+    const transformedData = transformData(data);
     return transformData(data);
   }
   catch (error) {
