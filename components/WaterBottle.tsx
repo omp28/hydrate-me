@@ -94,7 +94,7 @@ const WaterBottle: React.FC<PropsType> = () => {
   }, [isBottlePlaced, bottlePosition]);
 
   // 160 is the max height of water level in bottle
-  const waterHeight = (waterBottleLevel / 1000) * 160;
+  const waterHeight = (waterBottleLevel / 1500) * 160;
 
   return (
     <View style={styles.waterBottleCard}>

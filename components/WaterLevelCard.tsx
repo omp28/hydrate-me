@@ -8,6 +8,8 @@ const WaterLevelCard = () => {
   const animationRef = useRef<LottieView>(null);
   const [previousWaterIntake, setPreviousWaterIntake] = useState(0);
 
+  const { selectedDisease } = useUserInfoStore();
+
   const DailyGoal = useUserInfoStore((state) => state.dailyGoal);
   const TodayWaterIntake = useUserInfoStore((store) => store.todayWaterIntake);
   const updateUserInfo = useUserInfoStore((state) => state.updateUserInfo);
