@@ -30,7 +30,6 @@ export const getUserData = async () => {
         Accept: "application/json",
       },
     });
-
     if (!response.ok) {
       throw new Error("Failed to fetch user information");
     }
@@ -39,7 +38,7 @@ export const getUserData = async () => {
     return data
   }
   catch (error) {
-    console.error("Error fetching user data")
+    console.error("Error fetching user data",error);
   }
 }
 
