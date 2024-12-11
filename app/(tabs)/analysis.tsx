@@ -121,7 +121,7 @@ export default function Analysis() {
     { label: "Thyroid Disorder", value: "thyroid" },
   ];
 
-  const fetchWeather = async (latitude, longitude) => {
+  const fetchWeather = async (latitude: any, longitude: any) => {
     console.log("Selected Disease: ", selectedDisease); // Log to check if disease is correct
     try {
       const response = await axios.get(
